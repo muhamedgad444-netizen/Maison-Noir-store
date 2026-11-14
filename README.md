@@ -1,16 +1,106 @@
-# React + Vite
+# Maison Noir — Haute Parfumerie Store, Kaggle ML Scent Engine & n8n AI Automation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Maison Noir** is a full-stack luxury fragrance e-commerce platform powered by a **hybrid Machine Learning recommender engine** and **n8n Cloud AI automation workflows** with **Google Gemini 2.0 Flash**.
 
-Currently, two official plugins are available:
+Instead of relying on an LLM to guess products (which can cause hallucinations), Maison Noir uses a **deterministic TF-IDF + Cosine Similarity + Multi-Constraint ML Engine** to score and rank an 18-bottle flagship catalog enriched with Kaggle community ratings and Jungian psychological archetypes, then orchestrates **n8n Cloud workflows** to compose bespoke sensory copywriting and power **Layla Noor**, a bilingual (English/Arabic) AI Fragrance Concierge.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Kaggle ML Scent & Psychological Recommender (`backend/ml/recommender.js`)
+- **Sublinear TF-IDF Vectorization & Cosine Similarity:** Tokenizes olfactory pyramids (top/heart/base notes), tactile fabric descriptors, sensory memories, and psychological traits using $(1 + \ln(\text{tf})) \cdot \text{idf}$ weighting and L2-normalized cosine similarity.
+- **Domain Query Expansion:** Maps emotional, personality, and tactile keywords (*cozy*, *introvert*, *leader*, *cashmere*, *boozy*, *smoky*) into weighted accord vectors.
+- **Multi-Constraint Scoring:** Applies structured boosts and penalties across **Season** (Winter vs. Summer), **Gender** (Pour Homme, Pour Femme, Unisex), **Beast-Mode Sillage**, **Tier** (Niche vs. Designer), and **Kaggle Community Ratings**.
+- **18 Jungian Scent Archetypes:** Profiles every user into archetypes such as *The Quiet Sovereign*, *The Nocturnal Hedonist*, *The Mediterranean Aristocrat*, *The Velvet Mystic*, and *The Crystalline Icon*.
 
-## Expanding the ESLint configuration
+### 2. Layla Noor — Bilingual AI Fragrance Concierge (`backend/chat.js` & `ChatbotWidget.jsx`)
+- **6-Step Psychological & Gender Calibration Quiz:** Interactive step-by-step profiling covering *Gender & Olfactory Expression*, *Unspoken Room Presence*, *Inner Emotional Anchor*, *Sensory Memory & Chronotype*, *Tactile Fabric Affinity*, and *Sillage Distance*.
+- **Live ML Telemetry Header:** Synchronizes Season, Gender, Sillage pills, top accord percentage bars, and confidence states (`READY` → `CALIBRATING` → `HIGH`) in real time as you chat.
+- **Head-to-Head Bottle Comparator & Encyclopedia:** Ask about any bottle or compare two fragrances side by side with interactive product cards and direct **Add to Bag** actions.
+- **Bespoke Formula Composer:** Generates custom *Extrait de Parfum (30%)* formulas (`"L'Âme Secrète"`) with top/heart/base percentages and IFRA maceration guidance.
+- **Full Bilingual Support:** Automatic English & Arabic (`[\u0600-\u06FF]`) detection and response generation.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### 3. Multi-Workflow n8n Cloud Automation (`n8n/`)
+- **Workflow 5 — Master Nose Copywriter (`n8n/workflow 5/My workflow 5.json`):** Webhook-triggered LangChain + **Google Gemini 2.0 Flash** pipeline with a `Safe Parse & Error Guard` code node that writes a structured 3-part consultation (*The Scent Diagnosis*, *The Reveal*, *The Guarantee*).
+- **Workflow 6 — Layla Noor Conversational Agent (`n8n/chatbot assitace/My workflow 6.json`):** LangChain Chat Trigger + Gemini 2.0 Flash + `Simple Memory` window buffer (`contextWindowLength: 10`) trained on the 18-bottle Maison Noir collection.
+- **Automated SMTP Error Alerting (`n8n/workflow 5/Error Alert - My workflow 5.json`):** Dedicated `Error Trigger` workflow linked via `errorWorkflow` that emails diagnostic details (workflow name, failing node, error message, Cairo timestamp, and execution link) on failure.
+- **Programmatic Workflow Builder (`n8n/build-workflow.mjs`):** Node.js script that generates `n8n/master-nose.workflow.json` with `x-api-secret` header verification and output guardrails.
+
+---
+
+## Project Structure
+
+```text
+Maison-Noir-store/
+├── front end/                      # React 19 + Vite + Tailwind CSS + Framer Motion UI
+│   ├── public/                     # Perfume bottle imagery & static assets
+│   └── src/
+│       ├── components/
+│       │   ├── ChatbotWidget.jsx   # Layla Noor AI Concierge & Live ML Telemetry UI
+│       │   ├── MasterNoseModal.jsx # Bespoke AI Scent Consultation Modal
+│       │   ├── ProductCard.jsx     # Luxury 3D-tilt product cards
+│       │   ├── ProductDetail.jsx   # Olfactory pyramid & size selector drawer
+│       │   ├── CheckoutPanel.jsx   # Slide-over shopping bag & checkout flow
+│       │   ├── Navbar.jsx          # Navigation & collection filters
+│       │   └── CustomCursor.jsx    # Interactive luxury cursor
+│       ├── data/
+│       │   └── products.js         # 18-bottle catalog with notes, prices & metadata
+│       └── App.jsx                 # Main storefront layout & state management
+├── backend/                        # Zero-dependency Node.js HTTP API + ML Engine
+│   ├── ml/
+│   │   └── recommender.js          # Kaggle Persona Matrix, TF-IDF & Cosine Recommender
+│   ├── chat.js                     # Layla Noor session engine, 6-step quiz & n8n bridge
+│   ├── compose.js                  # Master Nose n8n webhook client & local fallback
+│   ├── server.js                   # REST API (/api/recommend & /api/chat)
+│   └── .env.example                # Environment variable template
+└── n8n/                            # n8n Cloud AI Automation Workflows
+    ├── workflow 5/
+    │   ├── My workflow 5.json              # Master Nose Gemini 2.0 Flash webhook workflow
+    │   └── Error Alert - My workflow 5.json # Automated SMTP error alert workflow
+    ├── chatbot assitace/
+    │   └── My workflow 6.json              # Layla Noor Chat Trigger + Memory workflow
+    ├── master-nose.workflow.json   # Code-built Master Nose workflow
+    └── build-workflow.mjs          # Script to regenerate master-nose.workflow.json
+```
+
+---
+
+## Getting Started Locally
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/muhamedgad444-netizen/Maison-Noir-store.git
+cd Maison-Noir-store
+```
+
+### 2. Configure & Start the Backend API (`http://localhost:5000`)
+```bash
+cd backend
+cp .env.example .env
+# Edit .env with your n8n Cloud webhook URLs (or leave blank to use the built-in local ML synthesis)
+npm start
+```
+
+### 3. Start the Frontend Storefront (`http://localhost:5173`)
+```bash
+cd "../front end"
+npm install
+npm run dev
+```
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/recommend` | Scores client profile (`season`, `texture`, `vibe`, `tier`, `persona`, `memory`, `fabric`) via the Kaggle ML engine and composes a 3-part narrative via **n8n Workflow 5** (with instant local fallback). |
+| `POST` | `/api/chat` | Powers **Layla Noor** (`chatInput`, `sessionId`, `reset`, `mlConstraints`), returning `reply`, `source`, `archetype`, `mlState` telemetry, recommended `products`, and quick-reply `options`. |
+
+---
+
+## Tech Stack
+- **Frontend:** React 19, Vite, Tailwind CSS, Framer Motion
+- **Backend & ML:** Node.js (ESM), Custom TF-IDF & Cosine Similarity Recommender, Kaggle Fragrance Persona Profiles
+- **AI & Automation:** n8n Cloud, Google Gemini 2.0 Flash, LangChain Agent & Window Buffer Memory, SMTP Error Alerting
