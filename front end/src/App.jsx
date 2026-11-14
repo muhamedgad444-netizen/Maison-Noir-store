@@ -766,7 +766,7 @@ export default function App() {
                 <ProductCard
                   product={p}
                   onSelect={(item) => setSelectedId(item.id)}
-                  onQuickAdd={(item) => addToCart(item, item.sizes?.[0])}
+                  onQuickAdd={(item, chosenSz) => addToCart(item, chosenSz || item.sizes?.[0])}
                 />
               </motion.div>
             ))}

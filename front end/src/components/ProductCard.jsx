@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { getPriceForSize } from "./ProductDetail";
 
 const ProductCard = ({ product, onSelect, onQuickAdd }) => {
   const isWinter = product.seasonType === "winter";
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "50ML");
+
+  const activePrice = `$${getPriceForSize(product.basePrice || 165, selectedSize)}`;
 
   return (
     <div
@@ -15,20 +20,24 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
         flexDirection: "column",
         height: "100%",
         background: "#fff",
-        border: "1px solid rgba(0,0,0,0.07)",
-        padding: "0.55rem",
+        border: "1px solid rgba(0,0,0,0.08)",
+        padding: "0.65rem",
         transition: "box-shadow 0.3s ease, transform 0.3s ease",
       }}
     >
-      {/* Image container */}
+      {/* Uniform Fixed-Height Image Container */}
       <motion.div
         layoutId={`card-${product.id}`}
         style={{
           position: "relative",
           background: "#f7f7f5",
           overflow: "hidden",
-          aspectRatio: "4/4.5",
+          height: 270,
+          width: "100%",
           border: "1px solid rgba(0,0,0,0.03)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
         whileHover="hover"
         initial="rest"
@@ -36,12 +45,12 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
       >
         <motion.div
           style={{
-            position: "absolute",
-            inset: 0,
+            width: "74%",
+            height: "74%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "1.75rem 1.25rem 1.5rem",
+            marginTop: "0.75rem",
           }}
           variants={{ rest: { scale: 1 }, hover: { scale: 1.05 } }}
           transition={{ duration: 1.1, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -51,8 +60,10 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             src={product.image}
             alt={product.name}
             style={{
-              width: "100%",
-              height: "100%",
+              maxWidth: "100%",
+              maxHeight: "100%",
+              width: "auto",
+              height: "auto",
               objectFit: "contain",
               mixBlendMode: "multiply",
               filter: "drop-shadow(0 12px 22px rgba(0,0,0,0.11))",
@@ -138,7 +149,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             data-cursor
             onClick={(e) => {
               e.stopPropagation();
-              onQuickAdd(product);
+              onQuickAdd(product, selectedSize);
             }}
             style={{
               width: "100%",
@@ -153,7 +164,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
               fontFamily: "Inter, sans-serif",
             }}
           >
-            + Quick Add · {product.sizes?.[0]}
+            + Quick Add · {selectedSize} ({activePrice})
           </button>
         </div>
       </motion.div>
@@ -177,6 +188,9 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             textTransform: "uppercase",
             color: "rgba(17,17,17,0.42)",
             marginBottom: 3,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
           {product.inspiration}
@@ -191,6 +205,9 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             marginBottom: 3,
             letterSpacing: "0.02em",
             lineHeight: 1.2,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
           }}
         >
           {product.name}
@@ -217,30 +234,52 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             paddingTop: 8,
             borderTop: "1px solid rgba(0,0,0,0.06)",
             display: "flex",
-            alignItems: "baseline",
+            alignItems: "center",
             justifyContent: "space-between",
+            gap: 6,
           }}
         >
           <span
             style={{
               fontFamily: "Cormorant Garamond, serif",
               fontStyle: "italic",
-              fontSize: "1.15rem",
+              fontSize: "1.2rem",
               color: "#111",
+              fontWeight: 400,
             }}
           >
-            {product.price}
+            {activePrice}
           </span>
-          <span
-            style={{
-              fontSize: 7.5,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "rgba(17,17,17,0.38)",
-            }}
-          >
-            {product.sizes?.join(" · ")}
-          </span>
+
+          {/* Interactive Size Pills */}
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            {product.sizes?.map((sz) => {
+              const isSelected = selectedSize === sz;
+              return (
+                <button
+                  key={sz}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedSize(sz);
+                  }}
+                  style={{
+                    fontSize: 7.5,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    padding: "3px 6px",
+                    border: isSelected ? "1px solid #111" : "1px solid rgba(0,0,0,0.14)",
+                    background: isSelected ? "#111" : "#fff",
+                    color: isSelected ? "#fff" : "rgba(17,17,17,0.65)",
+                    cursor: "pointer",
+                    transition: "all 0.18s ease",
+                  }}
+                >
+                  {sz}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
