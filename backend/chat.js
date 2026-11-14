@@ -234,10 +234,14 @@ async function callN8nGemini(bestProduct, userContext, match_confidence) {
 
   if (n8nChatUrl) {
     try {
+      const enrichedPrompt = bestProduct
+        ? `Client request: "${userContext}". Selected Maison Noir bottle: ${bestProduct.name} by ${bestProduct.house} (Top: ${bestProduct.notes_top}; Heart: ${bestProduct.notes_heart}; Base: ${bestProduct.notes_base}; Longevity: ${bestProduct.longevity}). In 2 concise, evocative paragraphs, explain why ${bestProduct.name} fits their request and give 1 practical application or layering tip.`
+        : userContext;
+
       const { stdout } = await execFileAsync("curl.exe", [
         "-s",
         "-m",
-        "8",
+        "20",
         "-X",
         "POST",
         n8nChatUrl,
@@ -246,7 +250,7 @@ async function callN8nGemini(bestProduct, userContext, match_confidence) {
         "-d",
         JSON.stringify({
           action: "sendMessage",
-          chatInput: userContext,
+          chatInput: enrichedPrompt,
           sessionId: "layla-cloud",
         }),
       ]);
