@@ -1124,14 +1124,24 @@ const CheckoutPanel = ({ cart, onUpdateQty, onRemove, onClose, onClearCart }) =>
 
   const handlePlaceOrder = (totals) => {
     const generatedId = `MN-2026-${Math.floor(100000 + Math.random() * 900000)}`;
-    setOrderResult({
+    const payload = {
       orderId: generatedId,
       customer,
       shipping,
+      payment: { method: payment.method },
+      promoCode: appliedPromo?.code || null,
       grandTotal: totals.grandTotal,
       cart: [...cart],
-    });
+    };
+    setOrderResult(payload);
     setPhase(3);
+
+    const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    fetch(`${apiBase}/api/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
   };
 
   const handleClose = () => {

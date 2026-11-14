@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { recommendBottle, KAGGLE_PROFILES } from "./ml/recommender.js";
 import { products as CATALOG_PRODUCTS } from "../front end/src/data/products.js";
+import { loadChatSession, saveChatSession, logRecommendationEvent } from "./supabase.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -326,7 +327,32 @@ export async function askLaylaNoor({
   mlConstraints = {},
 }) {
   if (reset) sessions.delete(sessionId);
+  if (!reset && !sessions.has(sessionId)) {
+    const persisted = await loadChatSession(sessionId).catch(() => null);
+    if (persisted) sessions.set(sessionId, persisted);
+  }
   const session = getSession(sessionId);
+  const res = await runLaylaNoorTurn({ chatInput, sessionId, session, mlConstraints });
+  saveChatSession(sessionId, session).catch(() => {});
+  if (res.mlState?.topBottle) {
+    logRecommendationEvent({
+      sourceEndpoint: "chat",
+      sessionId,
+      bottleId: res.mlState.topBottle.id,
+      bottleName: res.mlState.topBottle.name,
+      archetype: res.archetype || res.mlState.archetype,
+      matchConfidence: res.mlState.confidence,
+      userQuery: chatInput,
+    }).catch(() => {});
+  }
+  return res;
+}
+
+async function runLaylaNoorTurn({
+  chatInput = "",
+  session,
+  mlConstraints = {},
+}) {
   const ar = isArabic(chatInput);
   const cleanInput = chatInput.trim();
   const lower = cleanInput.toLowerCase();

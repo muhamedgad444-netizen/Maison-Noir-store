@@ -95,12 +95,15 @@ npm run dev
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/recommend` | Scores client profile (`season`, `texture`, `vibe`, `tier`, `persona`, `memory`, `fabric`) via the Kaggle ML engine and composes a 3-part narrative via **n8n Workflow 5** (with instant local fallback). |
-| `POST` | `/api/chat` | Powers **Layla Noor** (`chatInput`, `sessionId`, `reset`, `mlConstraints`), returning `reply`, `source`, `archetype`, `mlState` telemetry, recommended `products`, and quick-reply `options`. |
+| `POST` | `/api/recommend` | Scores client profile (`season`, `texture`, `vibe`, `tier`, `persona`, `memory`, `fabric`) via the Kaggle ML engine, composes a 3-part narrative via **n8n Workflow 5**, and logs telemetry to **Supabase** (`recommendation_events`). |
+| `POST` | `/api/chat` | Powers **Layla Noor** (`chatInput`, `sessionId`, `reset`, `mlConstraints`), persisting session memory in **Supabase** (`chat_sessions`) and logging recommended bottles (`recommendation_events`). |
+| `POST` | `/api/orders` | Saves completed storefront orders (`order_code`, customer details, shipping, items JSONB, and `grand_total`) into **Supabase** (`public.orders`). |
+| `GET` | `/api/orders` | Retrieves the most recent orders from **Supabase** (`public.orders`). |
 
 ---
 
 ## Tech Stack
 - **Frontend:** React 19, Vite, Tailwind CSS, Framer Motion
 - **Backend & ML:** Node.js (ESM), Custom TF-IDF & Cosine Similarity Recommender, Kaggle Fragrance Persona Profiles
+- **Database:** Supabase (PostgreSQL 17 with Row-Level Security) — `orders`, `chat_sessions`, `recommendation_events`
 - **AI & Automation:** n8n Cloud, Google Gemini 2.0 Flash, LangChain Agent & Window Buffer Memory, SMTP Error Alerting

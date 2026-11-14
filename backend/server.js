@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { recommendBottle, getProduct, KAGGLE_PROFILES } from "./ml/recommender.js";
 import { composeMessage } from "./compose.js";
 import { askLaylaNoor } from "./chat.js";
+import { saveOrder, listRecentOrders, logRecommendationEvent } from "./supabase.js";
 
 // Minimal .env loader (no dependencies)
 if (existsSync(new URL("./.env", import.meta.url))) {
@@ -15,7 +16,7 @@ if (existsSync(new URL("./.env", import.meta.url))) {
 const PORT = process.env.PORT || 5000;
 const cors = {
   "Access-Control-Allow-Origin": process.env.CORS_ORIGIN || "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 const send = (res, code, body) => {
@@ -27,7 +28,7 @@ http
   .createServer(async (req, res) => {
     if (req.method === "OPTIONS") return send(res, 204, {});
 
-    // 1) Master Nose ML Recommender + Workflow 5
+    // 1) Master Nose ML Recommender + Workflow 5 + Supabase Telemetry
     if (req.method === "POST" && req.url === "/api/recommend") {
       let raw = "";
       for await (const c of req) raw += c;
@@ -57,6 +58,17 @@ http
 
         const p = getProduct(rec.best.id);
         const k = KAGGLE_PROFILES[p.id] || {};
+
+        // Non-blocking log to Supabase recommendation_events
+        logRecommendationEvent({
+          sourceEndpoint: "recommend",
+          bottleId: rec.best.id,
+          bottleName: p.name,
+          archetype: k.archetype || "The Connoisseur",
+          matchConfidence: rec.match_confidence,
+          userQuery: `${profile.season} | ${profile.texture} | ${profile.vibe}`,
+        }).catch(() => {});
+
         return send(res, 200, {
           bottle_id: rec.best.id,
           match_confidence: rec.match_confidence,
@@ -75,7 +87,7 @@ http
       }
     }
 
-    // 2) Layla Noor Chatbot Concierge (Workflow 6 + Psychological Profiler)
+    // 2) Layla Noor Chatbot Concierge (Workflow 6 + Psychological Profiler + Supabase Session Persistence)
     if (req.method === "POST" && req.url === "/api/chat") {
       let raw = "";
       for await (const c of req) raw += c;
@@ -94,6 +106,30 @@ http
       }
     }
 
+    // 3) Supabase Order Creation & Listing
+    if (req.method === "POST" && req.url === "/api/orders") {
+      let raw = "";
+      for await (const c of req) raw += c;
+      try {
+        const body = JSON.parse(raw || "{}");
+        const saved = await saveOrder(body);
+        return send(res, 201, { status: "saved", order: saved || body });
+      } catch (e) {
+        console.error(e);
+        return send(res, 500, { error: "Could not save order." });
+      }
+    }
+
+    if (req.method === "GET" && req.url === "/api/orders") {
+      try {
+        const orders = await listRecentOrders(20);
+        return send(res, 200, { orders });
+      } catch (e) {
+        console.error(e);
+        return send(res, 500, { error: "Could not load orders." });
+      }
+    }
+
     send(res, 404, { error: "Not found" });
   })
-  .listen(PORT, () => console.log(`Master Nose & Layla Noor API on http://localhost:${PORT}`));
+  .listen(PORT, () => console.log(`Master Nose, Layla Noor & Supabase API on http://localhost:${PORT}`));
