@@ -1,5 +1,7 @@
 # Maison Noir — Haute Parfumerie Store, Kaggle ML Scent Engine & n8n AI Automation
 
+🌐 **Live Demo:** [MAISON NOIR · Haute Parfumerie & AI Scent Atelier](https://maison-noir-store.vercel.app/)
+
 **Maison Noir** is a full-stack luxury fragrance e-commerce platform powered by a **hybrid Machine Learning recommender engine** and **n8n Cloud AI automation workflows** with **Google Gemini 2.0 Flash**.
 
 Instead of relying on an LLM to guess products (which can cause hallucinations), Maison Noir uses a **deterministic TF-IDF + Cosine Similarity + Multi-Constraint ML Engine** to score and rank an 18-bottle flagship catalog enriched with Kaggle community ratings and Jungian psychological archetypes, then orchestrates **n8n Cloud workflows** to compose bespoke sensory copywriting and power **Layla Noor**, a bilingual (English/Arabic) AI Fragrance Concierge.
