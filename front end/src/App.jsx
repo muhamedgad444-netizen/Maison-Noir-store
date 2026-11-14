@@ -9,14 +9,6 @@ import ChatbotWidget from "./components/ChatbotWidget";
 import MasterNoseModal from "./components/MasterNoseModal";
 import { products, fragranceFamilies } from "./data/products";
 
-const HERO_SPOTLIGHT_IDS = [3, 18, 14, 13]; // Naxos, Baccarat Rouge 540, Angels' Share, Sauvage Elixir
-const HERO_ARCHETYPES = {
-  3: { archetype: "The Mediterranean Aristocrat", rating: "4.68" },
-  18: { archetype: "The Crystalline Icon", rating: "4.67" },
-  14: { archetype: "The Fireside Hedonist", rating: "4.69" },
-  13: { archetype: "The Nocturnal Maverick", rating: "4.66" },
-};
-
 const marqueeText = [
   "Bleu de Chanel", "·",
   "Xerjoff 1861 Naxos", "·",
@@ -41,9 +33,6 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [bagOpen, setBagOpen] = useState(false);
   const [masterNoseOpen, setMasterNoseOpen] = useState(false);
-  const [heroSpotId, setHeroSpotId] = useState(3);
-  const heroBottle = products.find((p) => p.id === heroSpotId) || products[2];
-  const heroMeta = HERO_ARCHETYPES[heroBottle.id] || { archetype: "The Connoisseur", rating: "4.65" };
 
   useEffect(() => {
     const timer = setTimeout(() => setShowIntro(false), 2000);
@@ -298,444 +287,143 @@ export default function App() {
           onBagClick={() => setBagOpen(true)}
         />
 
-        {/* ── Hero — Full Editorial Luxury Landing Showcase ─────── */}
+        {/* ── Hero — Full editorial luxury ─────── */}
         <section
           style={{
-            minHeight: "100vh",
-            background: "linear-gradient(135deg, #0d0d0f 0%, #151412 55%, #1c1914 100%)",
-            color: "#ece8df",
+            height: "100vh",
+            background: "#f6f5f3",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: "120px 2.5rem 4.5rem",
+            textAlign: "center",
+            padding: "0 2rem",
+            paddingTop: 100,
             position: "relative",
             overflow: "hidden",
           }}
         >
-          {/* Ambient radial gold glow + watermark */}
+          {/* Subtle watermark background typography */}
           <div
             style={{
               position: "absolute",
-              width: 680,
-              height: 680,
-              borderRadius: "50%",
-              background: "radial-gradient(circle, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0) 70%)",
-              right: "4%",
-              top: "12%",
-              pointerEvents: "none",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              fontSize: "clamp(7rem, 20vw, 19rem)",
+              fontSize: "clamp(8rem, 24vw, 22rem)",
               fontFamily: "Cormorant Garamond, serif",
               fontStyle: "italic",
-              color: "rgba(255,255,255,0.025)",
+              color: "rgba(0,0,0,0.025)",
               lineHeight: 1,
               letterSpacing: "-0.02em",
               userSelect: "none",
               pointerEvents: "none",
-              bottom: "4%",
-              left: "3%",
+              top: "50%",
+              transform: "translateY(-50%)",
               whiteSpace: "nowrap",
             }}
           >
-            Maison Noir
+            Haute Parfumerie
           </div>
 
-          <div
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
             style={{
-              maxWidth: 1260,
-              width: "100%",
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-              gap: "3.5rem",
-              alignItems: "center",
-              position: "relative",
-              zIndex: 2,
+              fontSize: 9,
+              letterSpacing: "0.5em",
+              textTransform: "uppercase",
+              color: "rgba(17,17,17,0.45)",
+              marginBottom: "1.5rem",
             }}
           >
-            {/* Left Column: Editorial Headline + CTAs + Metrics */}
-            <div style={{ textAlign: "left" }}>
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "6px 14px",
-                  borderRadius: 999,
-                  background: "rgba(212,175,55,0.1)",
-                  border: "1px solid rgba(212,175,55,0.32)",
-                  fontSize: 9,
-                  letterSpacing: "0.28em",
-                  textTransform: "uppercase",
-                  color: "#f1d27a",
-                  marginBottom: "1.5rem",
-                }}
-              >
-                <span>✦</span>
-                <span>Maison Noir Paris · Haute Parfumerie & AI Scent Atelier</span>
-              </motion.div>
+            Maison Noir · Édition 2026
+          </motion.p>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.1, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="serif italic"
-                style={{
-                  fontSize: "clamp(3.2rem, 6.8vw, 6.2rem)",
-                  lineHeight: 0.95,
-                  letterSpacing: "-0.02em",
-                  color: "#fff",
-                  marginBottom: "1.4rem",
-                }}
-              >
-                Architecture<br />
-                <span style={{ color: "#f1d27a" }}>of Scent.</span>
-              </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="serif italic"
+            style={{
+              fontSize: "clamp(3.5rem, 9.5vw, 8.5rem)",
+              lineHeight: 0.94,
+              letterSpacing: "-0.02em",
+              color: "#111",
+              marginBottom: "1.75rem",
+            }}
+          >
+            Architecture<br />of Scent.
+          </motion.h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.55 }}
-                style={{
-                  fontSize: 13.5,
-                  color: "rgba(236,232,223,0.72)",
-                  maxWidth: 520,
-                  lineHeight: 1.8,
-                  fontWeight: 300,
-                  marginBottom: "2.2rem",
-                }}
-              >
-                Eighteen flagship Extrait & Eau de Parfum creations inspired by the world’s most coveted
-                houses—paired with our <strong style={{ color: "#fff", fontWeight: 400 }}>Kaggle Machine Learning Recommender</strong> and{" "}
-                <strong style={{ color: "#f1d27a", fontWeight: 400 }}>n8n Gemini 2.0 Olfactory Concierge</strong> to
-                match your exact psychological aura.
-              </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1.2 }}
+            style={{
+              fontSize: 12.5,
+              color: "rgba(17,17,17,0.55)",
+              maxWidth: 480,
+              lineHeight: 1.8,
+              fontWeight: 300,
+            }}
+          >
+            Mastercrafted olfactory creations inspired by the world’s most coveted niche and designer houses —
+            curated for Winter warmth and Summer radiance.
+          </motion.p>
 
-              {/* Hero CTAs */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.75 }}
-                style={{ display: "flex", gap: "0.9rem", flexWrap: "wrap", marginBottom: "2.6rem" }}
-              >
-                <button
-                  onClick={() => setMasterNoseOpen(true)}
-                  style={{
-                    fontSize: 9.5,
-                    letterSpacing: "0.24em",
-                    textTransform: "uppercase",
-                    color: "#111",
-                    background: "linear-gradient(135deg, #f7e2a0, #d4af37)",
-                    border: "none",
-                    padding: "15px 24px",
-                    fontWeight: 600,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 10,
-                    boxShadow: "0 14px 34px rgba(212,175,55,0.25)",
-                  }}
-                >
-                  <span>✦</span>
-                  <span>Consult The Master Nose AI</span>
-                </button>
-
-                <a
-                  href="#collection"
-                  onClick={() => {
-                    setSeasonFilter("winter");
-                    setFamilyFilter(null);
-                  }}
-                  style={{
-                    fontSize: 9,
-                    letterSpacing: "0.24em",
-                    textTransform: "uppercase",
-                    color: "#ece8df",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.18)",
-                    padding: "14px 20px",
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  Winter Vault ❄️
-                </a>
-
-                <a
-                  href="#collection"
-                  onClick={() => {
-                    setSeasonFilter("summer");
-                    setFamilyFilter(null);
-                  }}
-                  style={{
-                    fontSize: 9,
-                    letterSpacing: "0.24em",
-                    textTransform: "uppercase",
-                    color: "#ece8df",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.18)",
-                    padding: "14px 20px",
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  Summer Vault ☀️
-                </a>
-              </motion.div>
-
-              {/* 4 Luxury Telemetry Pillars */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-                  gap: "1rem",
-                  paddingTop: "1.6rem",
-                  borderTop: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                {[
-                  { val: "18", label: "Flagship Flacons" },
-                  { val: "30%", label: "Extrait Oil Grade" },
-                  { val: "TF-IDF", label: "Kaggle ML Engine" },
-                  { val: "18+ Hrs", label: "Beast-Mode Trail" },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <div className="serif italic" style={{ fontSize: "1.7rem", color: "#f1d27a", lineHeight: 1 }}>
-                      {stat.val}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 8,
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                        color: "rgba(236,232,223,0.48)",
-                        marginTop: 5,
-                      }}
-                    >
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Column: Interactive Flagship Flacon Spotlight Pedestal */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, delay: 0.45 }}
+          {/* Quick Collection Anchor Buttons */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.6 }}
+            style={{ marginTop: "2.8rem", display: "flex", gap: "1.5rem", flexWrap: "wrap", justifyContent: "center" }}
+          >
+            <a
+              href="#collection"
+              data-cursor
+              onClick={() => {
+                setSeasonFilter("winter");
+                setFamilyFilter(null);
+              }}
               style={{
-                background: "rgba(255,255,255,0.035)",
-                border: "1px solid rgba(212,175,55,0.24)",
-                borderRadius: 20,
-                padding: "1.8rem",
-                backdropFilter: "blur(14px)",
-                boxShadow: "0 30px 80px rgba(0,0,0,0.45)",
+                fontSize: 8.5,
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                color: "#fff",
+                background: "#111",
+                padding: "12px 24px",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              {/* Top Bar: Archetype + Kaggle Score */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "1.2rem",
-                  flexWrap: "wrap",
-                  gap: 8,
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 8.5,
-                    letterSpacing: "0.2em",
-                    textTransform: "uppercase",
-                    padding: "4px 11px",
-                    borderRadius: 999,
-                    background: "rgba(212,175,55,0.14)",
-                    border: "1px solid rgba(212,175,55,0.35)",
-                    color: "#f1d27a",
-                  }}
-                >
-                  ✦ {heroMeta.archetype}
-                </span>
-                <span style={{ fontSize: 10, letterSpacing: "0.16em", color: "rgba(236,232,223,0.65)" }}>
-                  KAGGLE SCORE <strong style={{ color: "#f1d27a" }}>{heroMeta.rating}★</strong>
-                </span>
-              </div>
+              Explore Winter Collection ❄️
+            </a>
 
-              {/* Bottle Image + Core Details */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "150px 1fr",
-                  gap: "1.4rem",
-                  alignItems: "center",
-                }}
-              >
-                <div
-                  onClick={() => setSelectedId(heroBottle.id)}
-                  style={{
-                    background: "#f6f4ee",
-                    borderRadius: 16,
-                    height: 200,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 14,
-                    cursor: "pointer",
-                  }}
-                >
-                  <img
-                    src={heroBottle.image}
-                    alt={heroBottle.name}
-                    style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }}
-                  />
-                </div>
-
-                <div style={{ textAlign: "left" }}>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      letterSpacing: "0.26em",
-                      textTransform: "uppercase",
-                      color: "rgba(236,232,223,0.5)",
-                    }}
-                  >
-                    {heroBottle.brand} · {heroBottle.season}
-                  </div>
-                  <h3
-                    className="serif italic"
-                    style={{ fontSize: "2rem", color: "#fff", lineHeight: 1.05, margin: "4px 0 6px" }}
-                  >
-                    {heroBottle.name}
-                  </h3>
-                  <div style={{ fontSize: 15, color: "#f1d27a", fontWeight: 500, marginBottom: 10 }}>
-                    {heroBottle.price}{" "}
-                    <span style={{ fontSize: 10, color: "rgba(236,232,223,0.45)", fontWeight: 300 }}>
-                      · {heroBottle.longevity}
-                    </span>
-                  </div>
-
-                  {/* Olfactory Pyramid Mini-Rows */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 5,
-                      fontSize: 11,
-                      color: "rgba(236,232,223,0.78)",
-                      marginBottom: 14,
-                    }}
-                  >
-                    <div>
-                      <strong style={{ color: "#f1d27a", fontSize: 9, letterSpacing: "0.14em" }}>TOP: </strong>
-                      {heroBottle.top}
-                    </div>
-                    <div>
-                      <strong style={{ color: "#f1d27a", fontSize: 9, letterSpacing: "0.14em" }}>HEART: </strong>
-                      {heroBottle.heart}
-                    </div>
-                    <div>
-                      <strong style={{ color: "#f1d27a", fontSize: 9, letterSpacing: "0.14em" }}>BASE: </strong>
-                      {heroBottle.base}
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button
-                      onClick={() => addToCart(heroBottle, heroBottle.sizes?.[0])}
-                      style={{
-                        background: "#d4af37",
-                        color: "#111",
-                        border: "none",
-                        padding: "9px 15px",
-                        fontSize: 8.5,
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                        fontWeight: 600,
-                      }}
-                    >
-                      + Add to Bag
-                    </button>
-                    <button
-                      onClick={() => setSelectedId(heroBottle.id)}
-                      style={{
-                        background: "transparent",
-                        color: "#ece8df",
-                        border: "1px solid rgba(255,255,255,0.22)",
-                        padding: "9px 14px",
-                        fontSize: 8.5,
-                        letterSpacing: "0.2em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      Inspect Flacon
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Spotlight Switcher Pills */}
-              <div
-                style={{
-                  marginTop: "1.3rem",
-                  paddingTop: "1rem",
-                  borderTop: "1px solid rgba(255,255,255,0.08)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 6,
-                  flexWrap: "wrap",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 8,
-                    letterSpacing: "0.22em",
-                    textTransform: "uppercase",
-                    color: "rgba(236,232,223,0.45)",
-                  }}
-                >
-                  Spotlight Icons:
-                </span>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {HERO_SPOTLIGHT_IDS.map((id) => {
-                    const p = products.find((item) => item.id === id);
-                    if (!p) return null;
-                    const active = heroSpotId === id;
-                    return (
-                      <button
-                        key={id}
-                        onClick={() => setHeroSpotId(id)}
-                        style={{
-                          fontSize: 8.5,
-                          letterSpacing: "0.14em",
-                          textTransform: "uppercase",
-                          padding: "5px 10px",
-                          borderRadius: 999,
-                          background: active ? "#d4af37" : "rgba(255,255,255,0.06)",
-                          color: active ? "#111" : "rgba(236,232,223,0.75)",
-                          border: "none",
-                          fontWeight: active ? 600 : 400,
-                        }}
-                      >
-                        {p.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          </div>
+            <a
+              href="#collection"
+              data-cursor
+              onClick={() => {
+                setSeasonFilter("summer");
+                setFamilyFilter(null);
+              }}
+              style={{
+                fontSize: 8.5,
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                color: "#111",
+                background: "#fff",
+                border: "1px solid rgba(0,0,0,0.15)",
+                padding: "12px 24px",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              Explore Summer Collection ☀️
+            </a>
+          </motion.div>
         </section>
 
         {/* ── Marquee Band ─────────────────────────────── */}

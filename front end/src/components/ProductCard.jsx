@@ -8,7 +8,17 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
       className="product-card-wrap group"
       onClick={() => onSelect(product)}
       data-cursor
-      style={{ position: "relative", cursor: "pointer", display: "flex", flexDirection: "column", height: "100%" }}
+      style={{
+        position: "relative",
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        background: "#fff",
+        border: "1px solid rgba(0,0,0,0.07)",
+        padding: "0.85rem",
+        transition: "box-shadow 0.35s ease, transform 0.35s ease",
+      }}
     >
       {/* Image container */}
       <motion.div
@@ -31,7 +41,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "2rem",
+            padding: "3.25rem 2.25rem 2.75rem",
           }}
           variants={{ rest: { scale: 1 }, hover: { scale: 1.05 } }}
           transition={{ duration: 1.1, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -54,11 +64,11 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
         <div
           style={{
             position: "absolute",
-            top: 12,
-            left: 12,
+            top: 16,
+            left: 16,
             display: "flex",
             flexDirection: "column",
-            gap: 4,
+            gap: 6,
             alignItems: "flex-start",
           }}
         >
@@ -70,7 +80,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
               background: isWinter ? "#111" : "#fff",
               color: isWinter ? "#fff" : "#111",
               border: isWinter ? "1px solid #111" : "1px solid rgba(0,0,0,0.1)",
-              padding: "4px 8px",
+              padding: "5px 10px",
               fontFamily: "Inter, sans-serif",
               fontWeight: 400,
             }}
@@ -85,7 +95,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
               background: "rgba(255,255,255,0.92)",
               backdropFilter: "blur(6px)",
               color: "rgba(17,17,17,0.7)",
-              padding: "3px 7px",
+              padding: "4px 9px",
             }}
           >
             {product.gender}
@@ -96,8 +106,8 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
         <div
           style={{
             position: "absolute",
-            top: 12,
-            right: 12,
+            top: 18,
+            right: 16,
             fontSize: 7.5,
             letterSpacing: "0.2em",
             textTransform: "uppercase",
@@ -114,7 +124,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             bottom: 0,
             left: 0,
             right: 0,
-            padding: "12px",
+            padding: "14px",
             background: "linear-gradient(to top, rgba(255,255,255,0.95), rgba(255,255,255,0))",
             display: "flex",
             justifyContent: "center",
@@ -132,7 +142,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
             }}
             style={{
               width: "100%",
-              padding: "10px 14px",
+              padding: "11px 16px",
               background: "#111",
               color: "#fff",
               fontSize: 8,
@@ -152,14 +162,21 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
       <div className="product-card-line" />
 
       {/* Info below image */}
-      <div style={{ paddingTop: "1.1rem", display: "flex", flexDirection: "column", flex: 1 }}>
+      <div
+        style={{
+          padding: "1.35rem 0.65rem 0.6rem",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+        }}
+      >
         <p
           style={{
             fontSize: 8,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
-            color: "rgba(17,17,17,0.4)",
-            marginBottom: 4,
+            color: "rgba(17,17,17,0.42)",
+            marginBottom: 8,
           }}
         >
           {product.inspiration}
@@ -169,11 +186,11 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
           layoutId={`title-${product.id}`}
           className="serif italic"
           style={{
-            fontSize: "1.2rem",
+            fontSize: "1.3rem",
             color: "#111",
-            marginBottom: 4,
+            marginBottom: 8,
             letterSpacing: "0.02em",
-            lineHeight: 1.2,
+            lineHeight: 1.25,
           }}
         >
           {product.name}
@@ -181,11 +198,11 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
 
         <p
           style={{
-            fontSize: 9,
-            letterSpacing: "0.15em",
+            fontSize: 9.5,
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
-            color: "rgba(17,17,17,0.45)",
-            marginBottom: 8,
+            color: "rgba(17,17,17,0.48)",
+            marginBottom: 18,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
@@ -194,12 +211,21 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
           {product.tagline}
         </p>
 
-        <div style={{ marginTop: "auto", display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+        <div
+          style={{
+            marginTop: "auto",
+            paddingTop: 14,
+            borderTop: "1px solid rgba(0,0,0,0.06)",
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+          }}
+        >
           <span
             style={{
               fontFamily: "Cormorant Garamond, serif",
               fontStyle: "italic",
-              fontSize: "1.15rem",
+              fontSize: "1.25rem",
               color: "#111",
             }}
           >
@@ -210,7 +236,7 @@ const ProductCard = ({ product, onSelect, onQuickAdd }) => {
               fontSize: 8,
               letterSpacing: "0.2em",
               textTransform: "uppercase",
-              color: "rgba(17,17,17,0.35)",
+              color: "rgba(17,17,17,0.38)",
             }}
           >
             {product.sizes?.join(" · ")}
