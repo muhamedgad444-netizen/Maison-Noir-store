@@ -37,12 +37,18 @@ const marqueeText = [
 const LOCAL_STORAGE_KEY = "maison_noir_cart_v2";
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [bagOpen, setBagOpen] = useState(false);
   const [masterNoseOpen, setMasterNoseOpen] = useState(false);
   const [heroSpotId, setHeroSpotId] = useState(3);
   const heroBottle = products.find((p) => p.id === heroSpotId) || products[2];
   const heroMeta = HERO_ARCHETYPES[heroBottle.id] || { archetype: "The Connoisseur", rating: "4.65" };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowIntro(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Cart state persisted in localStorage
   const [cart, setCart] = useState(() => {
@@ -185,6 +191,106 @@ export default function App() {
         position="bottom-center"
         toastOptions={{ style: { background: "transparent", boxShadow: "none", padding: 0 } }}
       />
+
+      {/* ── 2-Second Luxury Intro Splash Animation ── */}
+      <AnimatePresence>
+        {showIntro && (
+          <motion.div
+            key="maison-noir-intro"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, y: "-100%" }}
+            transition={{ duration: 0.65, ease: [0.76, 0, 0.24, 1] }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 99999,
+              background: "radial-gradient(circle at center, #171512 0%, #09090b 100%)",
+              color: "#ece8df",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              overflow: "hidden",
+            }}
+          >
+            {/* Expanding golden aura ring */}
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1.35, opacity: [0, 0.35, 0] }}
+              transition={{ duration: 1.9, ease: "easeOut" }}
+              style={{
+                position: "absolute",
+                width: 340,
+                height: 340,
+                borderRadius: "50%",
+                border: "1px solid rgba(212,175,55,0.45)",
+                pointerEvents: "none",
+              }}
+            />
+
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.1 }}
+              style={{
+                fontSize: 9.5,
+                letterSpacing: "0.48em",
+                textTransform: "uppercase",
+                color: "#d4af37",
+                marginBottom: 14,
+              }}
+            >
+              ✦ Paris · Haute Parfumerie ✦
+            </motion.span>
+
+            <motion.h1
+              initial={{ opacity: 0, scale: 0.94, letterSpacing: "0.08em" }}
+              animate={{ opacity: 1, scale: 1, letterSpacing: "0.22em" }}
+              transition={{ duration: 1.1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="serif"
+              style={{
+                fontSize: "clamp(2.4rem, 6vw, 4.8rem)",
+                textTransform: "uppercase",
+                color: "#fff",
+                fontWeight: 300,
+              }}
+            >
+              Maison Noir
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.65 }}
+              transition={{ duration: 0.6, delay: 0.45 }}
+              className="serif italic"
+              style={{ fontSize: "1.15rem", color: "#f1d27a", marginTop: 6, marginBottom: 26 }}
+            >
+              Architecture of Scent · AI Olfactory Atelier
+            </motion.p>
+
+            {/* 2-Second Gold Progress Line */}
+            <div
+              style={{
+                width: 180,
+                height: 1.5,
+                background: "rgba(255,255,255,0.12)",
+                overflow: "hidden",
+                borderRadius: 2,
+              }}
+            >
+              <motion.div
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: 1.75, ease: "easeInOut" }}
+                style={{
+                  height: "100%",
+                  background: "linear-gradient(90deg, #9c7a1c, #f7e2a0, #d4af37)",
+                }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main style={{ minHeight: "100vh", background: "#fff" }}>
         <Navbar
