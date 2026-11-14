@@ -228,9 +228,51 @@ const PSYCH_QUESTIONS = [
   },
 ];
 
+const DEFAULT_N8N_WEBHOOK_URL =
+  "https://muhamedshalaby.app.n8n.cloud/webhook/76097c32-de06-41c1-81a8-0c157a12dedf";
+const DEFAULT_N8N_CHAT_WEBHOOK_URL =
+  "https://muhamedshalaby.app.n8n.cloud/webhook/696f6b02-fd47-4ebe-bb91-a99f394361f2/chat";
+
+async function postJsonCrossPlatform(url, payload, timeoutMs = 18000) {
+  const bodyStr = JSON.stringify(payload);
+  if (process.platform === "win32") {
+    try {
+      const { stdout } = await execFileAsync("curl.exe", [
+        "-s",
+        "-m",
+        String(Math.ceil(timeoutMs / 1000)),
+        "-X",
+        "POST",
+        url,
+        "-H",
+        "Content-Type: application/json",
+        "-d",
+        bodyStr,
+      ]);
+      return JSON.parse(stdout);
+    } catch {
+      // Fall through to native fetch
+    }
+  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      signal: ctrl.signal,
+      headers: { "Content-Type": "application/json" },
+      body: bodyStr,
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function callN8nGemini(bestProduct, userContext, match_confidence) {
-  const n8nChatUrl = process.env.N8N_CHAT_WEBHOOK_URL;
-  const n8nMainUrl = process.env.N8N_WEBHOOK_URL;
+  const n8nChatUrl = process.env.N8N_CHAT_WEBHOOK_URL || DEFAULT_N8N_CHAT_WEBHOOK_URL;
+  const n8nMainUrl = process.env.N8N_WEBHOOK_URL || DEFAULT_N8N_WEBHOOK_URL;
 
   if (n8nChatUrl) {
     try {
@@ -238,23 +280,15 @@ async function callN8nGemini(bestProduct, userContext, match_confidence) {
         ? `Client request: "${userContext}". Selected Maison Noir bottle: ${bestProduct.name} by ${bestProduct.house} (Top: ${bestProduct.notes_top}; Heart: ${bestProduct.notes_heart}; Base: ${bestProduct.notes_base}; Longevity: ${bestProduct.longevity}). In 2 concise, evocative paragraphs, explain why ${bestProduct.name} fits their request and give 1 practical application or layering tip.`
         : userContext;
 
-      const { stdout } = await execFileAsync("curl.exe", [
-        "-s",
-        "-m",
-        "20",
-        "-X",
-        "POST",
+      const data = await postJsonCrossPlatform(
         n8nChatUrl,
-        "-H",
-        "Content-Type: application/json",
-        "-d",
-        JSON.stringify({
+        {
           action: "sendMessage",
           chatInput: enrichedPrompt,
           sessionId: "layla-cloud",
-        }),
-      ]);
-      const data = JSON.parse(stdout);
+        },
+        20000
+      );
       const reply = data?.output || data?.reply || data?.text || (!data?.code ? data?.message : null);
       if (
         reply &&
@@ -270,17 +304,9 @@ async function callN8nGemini(bestProduct, userContext, match_confidence) {
 
   if (n8nMainUrl && bestProduct) {
     try {
-      const { stdout } = await execFileAsync("curl.exe", [
-        "-s",
-        "-m",
-        "15",
-        "-X",
-        "POST",
+      const data = await postJsonCrossPlatform(
         n8nMainUrl,
-        "-H",
-        "Content-Type: application/json",
-        "-d",
-        JSON.stringify({
+        {
           bottle: bestProduct,
           profile: {
             season: bestProduct.season,
@@ -290,9 +316,9 @@ async function callN8nGemini(bestProduct, userContext, match_confidence) {
           },
           match_confidence,
           season_conflict: false,
-        }),
-      ]);
-      const data = JSON.parse(stdout);
+        },
+        15000
+      );
       if (data?.message && !data?.code) {
         return { text: String(data.message), source: "n8n-cloud-gemini" };
       }

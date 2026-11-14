@@ -62,7 +62,11 @@ const MasterNoseModal = ({ onClose, onSelectProduct, onAddToCart, allProducts })
     setLoading(true);
     setError("");
     try {
-      const apiBase = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const apiBase =
+        import.meta.env.VITE_API_URL ||
+        (typeof window !== "undefined" && window.location.hostname === "localhost"
+          ? "http://localhost:5000"
+          : "");
       const res = await fetch(`${apiBase}/api/recommend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

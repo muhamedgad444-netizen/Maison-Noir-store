@@ -79,8 +79,11 @@ async function postToN8n(url, payload, timeoutMs) {
   }
 }
 
+const DEFAULT_N8N_WEBHOOK_URL =
+  "https://muhamedshalaby.app.n8n.cloud/webhook/76097c32-de06-41c1-81a8-0c157a12dedf";
+
 export async function composeMessage({ bottle, profile, match_confidence, season_conflict }) {
-  const url = process.env.N8N_WEBHOOK_URL;
+  const url = process.env.N8N_WEBHOOK_URL || DEFAULT_N8N_WEBHOOK_URL;
   if (url) {
     const timeoutMs = Number(process.env.N8N_TIMEOUT_MS) || 25000;
     try {

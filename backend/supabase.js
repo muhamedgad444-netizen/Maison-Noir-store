@@ -3,9 +3,13 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
+const DEFAULT_SUPABASE_URL = "https://zscddqfbrndvxdylbpzx.supabase.co";
+const DEFAULT_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpzY2RkcWZicm5kdnhkeWxicHp4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2NjkzODUsImV4cCI6MjExMDI0NTM4NX0.ykJYB3MG2OwfGB-9zD_UG-rat4ap2UwKY6yZX1f46hA";
+
 function getConfig() {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+  const url = process.env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const key = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
   if (!url || !key) return null;
   return { url: url.replace(/\/$/, ""), key };
 }

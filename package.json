@@ -1,0 +1,11 @@
+{
+  "name": "maison-noir-fullstack",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix \"front end\" run dev",
+    "build": "npm --prefix \"front end\" install && npm --prefix \"front end\" run build",
+    "start": "node backend/server.js"
+  }
+}
