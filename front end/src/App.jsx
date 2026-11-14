@@ -33,7 +33,6 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [bagOpen, setBagOpen] = useState(false);
   const [masterNoseOpen, setMasterNoseOpen] = useState(false);
-  const [deviceMode, setDeviceMode] = useState("desktop"); // "desktop" | "tablet" | "phone"
 
   useEffect(() => {
     const timer = setTimeout(() => setShowIntro(false), 2000);
@@ -282,31 +281,10 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <div
-        style={{
-          minHeight: "100vh",
-          background: deviceMode === "desktop" ? "#fff" : "#18181b",
-          padding: deviceMode === "desktop" ? 0 : "24px 12px 80px",
-          transition: "background 0.3s ease, padding 0.3s ease",
-        }}
-      >
-      <main
-        style={{
-          minHeight: "100vh",
-          background: "#fff",
-          maxWidth: deviceMode === "phone" ? 390 : deviceMode === "tablet" ? 768 : "100%",
-          margin: "0 auto",
-          borderRadius: deviceMode === "desktop" ? 0 : 28,
-          overflow: deviceMode === "desktop" ? "visible" : "hidden",
-          boxShadow: deviceMode === "desktop" ? "none" : "0 30px 90px rgba(0,0,0,0.55)",
-          border: deviceMode === "desktop" ? "none" : "6px solid #27272a",
-          transition: "max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
-        }}
-      >
+      <main style={{ minHeight: "100vh", background: "#fff" }}>
         <Navbar
           cartCount={totalBagItemsCount}
           onBagClick={() => setBagOpen(true)}
-          deviceMode={deviceMode}
         />
 
         {/* ── Hero — Full editorial luxury ─────── */}
@@ -479,7 +457,7 @@ export default function App() {
         {/* ── Shop by Olfactory Family ─────────────────── */}
         <section
           style={{
-            padding: deviceMode === "phone" ? "3.25rem 1.25rem" : "5rem clamp(1.25rem, 4vw, 3rem)",
+            padding: "clamp(2.5rem, 5vw, 4rem) clamp(1rem, 3.5vw, 2.5rem)",
             maxWidth: 1140,
             margin: "0 auto",
             textAlign: "center",
@@ -565,7 +543,7 @@ export default function App() {
         <section
           id="collection"
           style={{
-            padding: deviceMode === "phone" ? "1.5rem 1.15rem 5rem" : "2rem clamp(1.25rem, 4vw, 3rem) 8rem",
+            padding: "1.5rem clamp(1rem, 3.5vw, 2.5rem) 5rem",
             maxWidth: 1260,
             margin: "0 auto",
           }}
@@ -776,11 +754,7 @@ export default function App() {
           )}
 
           {/* Product Grid */}
-          <div
-            className={`product-grid ${
-              deviceMode === "phone" ? "grid-phone" : deviceMode === "tablet" ? "grid-tablet" : ""
-            }`}
-          >
+          <div className="product-grid">
             {filteredProducts.map((p, i) => (
               <motion.div
                 key={p.id}
@@ -944,55 +918,6 @@ export default function App() {
           allProducts={products}
         />
       </main>
-
-      {/* ── Interactive Screen Adjuster (Desktop / Tablet / Phone) ─── */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 24,
-          left: 24,
-          zIndex: 9997,
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
-          padding: 4,
-          borderRadius: 999,
-          background: "rgba(17,17,19,0.92)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(212,175,55,0.32)",
-          boxShadow: "0 14px 36px rgba(0,0,0,0.28)",
-          fontFamily: "Inter, sans-serif",
-        }}
-      >
-        {[
-          { id: "desktop", label: "🖥️ Desktop" },
-          { id: "tablet", label: "📱 Tablet" },
-          { id: "phone", label: "📱 Phone" },
-        ].map((m) => {
-          const active = deviceMode === m.id;
-          return (
-            <button
-              key={m.id}
-              onClick={() => setDeviceMode(m.id)}
-              style={{
-                padding: "7px 13px",
-                borderRadius: 999,
-                border: "none",
-                fontSize: 9.5,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                background: active ? "#d4af37" : "transparent",
-                color: active ? "#111" : "rgba(236,232,223,0.75)",
-                fontWeight: active ? 600 : 400,
-                transition: "all 0.2s ease",
-              }}
-            >
-              {m.label}
-            </button>
-          );
-        })}
-      </div>
-      </div>
     </>
   );
 }
