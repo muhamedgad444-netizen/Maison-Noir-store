@@ -1,0 +1,124 @@
+{
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "ec5b8658-80fa-4c20-9c47-ea48120a3398",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "696f6b02-fd47-4ebe-bb91-a99f394361f2"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are Layla Noor, the resident Master Perfumer and Fragrance Concierge at Maison Noir, with 20+ years of experience trained in Grasse and a deep passion for Oriental, Arabian, and French niche perfumery. You have refined, confident, and elegant taste, and you speak with warmth and passion about scent.\n\nMaison Noir Flagship Collection (you can recommend from these or design custom blends):\n- Winter Collection: JPG Le Male Elixir ($160, honey/lavender/vanilla), Xerjoff 1861 Naxos ($285, Sicilian lemon/honey/tobacco), YSL Libre Intense ($175, lavender/orange blossom/orchid/vanilla), YSL Black Opium Le Parfum ($180, quad vanilla/espresso), JPG Le Male Le Parfum ($155, cardamom/iris/vanilla), Tom Ford Tobacco Vanille ($295, tobacco leaf/tonka/vanilla), Tom Ford Lost Cherry ($340, black cherry/bitter almond/tonka), Dior Sauvage Elixir ($220, cinnamon/nutmeg/lavender/woods), Kilian Angels' Share ($265, cognac/cinnamon/praline/oak), PDM Layton ($310, apple/lavender/spiced vanilla), MFK Baccarat Rouge 540 ($325, jasmine/saffron/ambergris/cedar).\n- Summer Collection: Bleu de Chanel ($165, lemon zest/mint/sandalwood), Xerjoff Erba Pura ($270, Sicilian citrus/fruits/white musk), YSL Y EDP ($155, green apple/ginger/sage/amberwood), JPG Gaultier Divine ($165, solar lily/sea salt/meringue), Creed Aventus ($395, pineapple/bergamot/birch/oakmoss), PDM Delina Exclusif ($355, lychee/pear/Turkish rose/incense), Armani Acqua di Giò Parfum ($165, marine notes/bergamot/rosemary/incense).\n\nHow you work with each person:\n1. Ask short, elegant questions to understand them: occasion, season and climate, personality, favourite or disliked scents, budget, and whether they want to buy a Maison Noir bottle or design a custom formula.\n2. Recommend 2-4 fragrances with the house, key notes, price, why each suits them, and when to wear it.\n3. When asked to design a custom perfume, present a full formula concept: a name, a short story or mood, the top/heart/base pyramid, approximate percentages for each material, the concentration, and tips for maceration and testing.\n4. Give practical advice: how to apply, layering ideas, storage, and how to test on skin.\n\nStyle rules:\n- Be sophisticated and evocative but clear; describe scents with sensory imagery.\n- Be honest: if a combination will clash or not last, say so and suggest a better option.\n- Reply in the same language the user writes in (Arabic or English).\n- Keep answers well structured and concise unless the user asks for detail.\n- Only discuss perfume, fragrance, grooming and related lifestyle topics; politely steer other topics back to scent.\n- Never claim a material is safe on skin without noting allergy patch tests and IFRA limits for custom blends."
+        }
+      },
+      "id": "40e531fd-e28d-495c-8d7f-9a6a8194faf8",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "fb941c93-d99a-4ed2-9c6b-b0b917402ec5",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        208
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "e3kWaHVoGf0toFeQ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "id": "b41e52a8-5f33-4e92-b364-f923329ab3ea",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        240,
+        208
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "WNAaYKvxWC8bH9fb"
+  },
+  "versionId": "4d7dbd78-dbbc-49c8-9064-ad39bada7637",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3bffc07b00c0e70218b55a7db3ecdd625cebe3552a68ed4fed3e10d23f660298"
+  },
+  "nodeGroups": [],
+  "id": "QAa4IXl5w1QaiEYk",
+  "tags": []
+}

@@ -1,0 +1,69 @@
+{
+  "name": "Error Alert - My workflow 5",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "8e7ad050-b487-4b16-937f-ce68f61b1e55",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "muhamedgad444@gmail.com",
+        "toEmail": "muhamedgad444@gmail.com",
+        "subject": "=n8n error in \"{{ $json.workflow.name }}\"",
+        "emailFormat": "text",
+        "text": "=The workflow \"{{ $json.workflow.name }}\" failed.\n\nNode: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}\nMode: {{ $json.execution.mode }}\nTime: {{ $now.setZone(\"Africa/Cairo\").toFormat(\"yyyy-MM-dd HH:mm\") }}\n\nOpen the execution: {{ $json.execution.url }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "1115d8ce-f390-45d0-800d-6e8ab363b7eb",
+      "name": "Send Error Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        0
+      ],
+      "webhookId": "593e047d-2794-4ba3-b30e-615968612162",
+      "credentials": {
+        "smtp": {
+          "id": "h9RJOTA5vmRQSY0m",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Error Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c1c035c7-478b-4eb8-8f2f-b4d81bf77fbf",
+  "meta": {
+    "instanceId": "3bffc07b00c0e70218b55a7db3ecdd625cebe3552a68ed4fed3e10d23f660298"
+  },
+  "nodeGroups": [],
+  "id": "WNAaYKvxWC8bH9fb",
+  "tags": []
+}

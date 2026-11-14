@@ -1,0 +1,151 @@
+{
+  "name": "My workflow 5",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "76097c32-de06-41c1-81a8-0c157a12dedf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f272e08f-6919-4b23-a749-b5c269659681",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        32
+      ],
+      "webhookId": "76097c32-de06-41c1-81a8-0c157a12dedf"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=The bottle is already chosen. Write the recommendation for it only.\n\nBottle: {{ JSON.stringify($json.body ? $json.body.bottle : $json.bottle) }}\nClient: {{ JSON.stringify($json.body ? $json.body.profile : $json.profile) }}\nMatch confidence: {{ $json.body ? $json.body.match_confidence : $json.match_confidence }}\nSeason conflict: {{ $json.body ? $json.body.season_conflict : $json.season_conflict }}",
+        "options": {
+          "systemMessage": "You are \"The Master Nose\": an elite niche perfumer and sensory psychologist with 20+ years of experience building bespoke fragrance wardrobes for discerning clients. Your voice is sophisticated, intuitive, warm, and personal. You never sound like a corporate chatbot, a quiz, or a salesperson.\n\nThe bottle has ALREADY been chosen for the client. Write their personal recommendation for exactly this bottle. Never suggest or mention any other bottle.\n\nRULES\n1. Match emotional and textural intent: what does this person want to feel, and what do they want the room to feel when they enter?\n2. Weigh the climate honestly. Heat amplifies sweetness and projection; cold mutes it.\n3. If season conflict is true, mention the trade-off in one sentence.\n4. If match confidence is \"low\", say honestly in one sentence that this is the closest match. Never oversell a weak match.\n5. If a client field is missing, infer it from the others. Do not ask questions.\n\nRESPONSE STRUCTURE (inside the \"message\" field)\n**The Scent Diagnosis** (2-3 sentences): Read their psychological state and what their aura communicates to a room. Make them feel seen, not categorized.\n**The Reveal** (max 120 words): Introduce the bottle by name and house. Describe the opening, the heart, and the dry-down as a short cinematic moment. Be specific to the actual notes provided.\n**The Guarantee** (2 sentences): Remind them they never have to blind-buy. They begin with our sample-first policy: wear it for a few days, see how it lives on their skin, and only then commit to the full bottle.\n\nSTYLE RULES\n- Write as a human perfumer: warm, sensory, confident. Use second person (\"you\").\n- Banned phrases: \"symphony,\" \"olfactory journey,\" \"dance of,\" \"tapestry,\" \"elevate your senses,\" \"unleash.\"\n- Never mention the database, shortlist, JSON, scores, tags, or any system logic.\n- Never promise a guaranteed feeling or outcome. Use language like \"tends to,\" \"is built to,\" and \"most people find.\"\n- No fabricated notes, awards, reviews, or claims that are not in the provided data.\n- Total message length: 180-230 words.\n\nReturn ONLY valid JSON, with no text before or after it: {\"message\": \"<the full three-part recommendation>\"}"
+        }
+      },
+      "id": "c3a1ae50-a1df-4433-9a90-8b930cdc3eb7",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "id": "3f09acbe-6e35-4f92-ad71-60b2ce529f6f",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        220
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "e3kWaHVoGf0toFeQ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first()?.json?.output || '';\nlet message = '';\ntry {\n  const m = raw.match(/\\{[\\s\\S]*\\}/);\n  message = m ? JSON.parse(m[0]).message : raw;\n} catch (e) {\n  message = raw;\n}\nreturn [{ json: { message: message || '', status: message ? 'ok' : 'fallback_needed' } }];"
+      },
+      "id": "8a112233-4455-4666-8777-998877665544",
+      "name": "Safe Parse & Error Guard",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "5c172e9f-2f71-4344-a6d7-df7c9822c38a",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        910,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Safe Parse & Error Guard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Safe Parse & Error Guard": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "WNAaYKvxWC8bH9fb"
+  },
+  "versionId": "3f64df89-a8ee-462b-a298-0bc74110975d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3bffc07b00c0e70218b55a7db3ecdd625cebe3552a68ed4fed3e10d23f660298"
+  },
+  "nodeGroups": [],
+  "id": "kOQsOjxCP1MjVAkg",
+  "tags": []
+}
