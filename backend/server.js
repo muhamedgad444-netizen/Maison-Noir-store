@@ -4,6 +4,7 @@ import { recommendBottle, getProduct, KAGGLE_PROFILES } from "./ml/recommender.j
 import { composeMessage } from "./compose.js";
 import { askLaylaNoor } from "./chat.js";
 import { saveOrder, listRecentOrders, logRecommendationEvent } from "./supabase.js";
+import { sendMaisonNoirEmails, sendOrderConfirmationEmail } from "./email.js";
 
 // Minimal .env loader (no dependencies)
 if (existsSync(new URL("./.env", import.meta.url))) {
@@ -106,14 +107,19 @@ http
       }
     }
 
-    // 3) Supabase Order Creation & Listing
+    // 3) Supabase Order Creation & Listing (+ Automatic n8n Workflow 7 Gmail Confirmation)
     if (req.method === "POST" && req.url === "/api/orders") {
       let raw = "";
       for await (const c of req) raw += c;
       try {
         const body = JSON.parse(raw || "{}");
         const saved = await saveOrder(body);
-        return send(res, 201, { status: "saved", order: saved || body });
+        const emailDispatch = await sendOrderConfirmationEmail(body).catch(() => null);
+        return send(res, 201, {
+          status: "saved",
+          order: saved || body,
+          emailDispatch,
+        });
       } catch (e) {
         console.error(e);
         return send(res, 500, { error: "Could not save order." });
@@ -127,6 +133,25 @@ http
       } catch (e) {
         console.error(e);
         return send(res, 500, { error: "Could not load orders." });
+      }
+    }
+
+    // 4) Personalized Gmail Marketing & Scent Dossier Dispatcher (n8n Workflow 7: maison-noir-emails)
+    if (req.method === "POST" && req.url === "/api/emails") {
+      let raw = "";
+      for await (const c of req) raw += c;
+      try {
+        const body = JSON.parse(raw || "{}");
+        const recipients = Array.isArray(body.recipients)
+          ? body.recipients
+          : body.email
+            ? [{ name: body.name || "Maison Noir Client", email: body.email, notes: body.notes || "none" }]
+            : [];
+        const result = await sendMaisonNoirEmails({ recipients });
+        return send(res, 200, result);
+      } catch (e) {
+        console.error(e);
+        return send(res, 400, { error: e.message || "Could not dispatch emails." });
       }
     }
 

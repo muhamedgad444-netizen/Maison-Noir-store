@@ -26,6 +26,7 @@ Instead of relying on an LLM to guess products (which can cause hallucinations),
 ### 3. Multi-Workflow n8n Cloud Automation (`n8n/`)
 - **Workflow 5 — Master Nose Copywriter (`n8n/workflow 5/My workflow 5.json`):** Webhook-triggered LangChain + **Google Gemini 2.0 Flash** pipeline with a `Safe Parse & Error Guard` code node that writes a structured 3-part consultation (*The Scent Diagnosis*, *The Reveal*, *The Guarantee*).
 - **Workflow 6 — Layla Noor Conversational Agent (`n8n/chatbot assitace/My workflow 6.json`):** LangChain Chat Trigger + Gemini 2.0 Flash + `Simple Memory` window buffer (`contextWindowLength: 10`) trained on the 18-bottle Maison Noir collection.
+- **Workflow 7 — Personalized Gmail Marketing & Order Dispatcher (`n8n/email sender/My workflow 7.json`):** Webhook (`POST /webhook/maison-noir-emails`) → `Split Recipients` (`body.recipients`) → `Write Personalized Email` (LangChain + Gemini 2.0 Flash + `Email Format` structured output parser) → `Send an Email` via Gmail SMTP (`muhamedgad444@gmail.com`) to any email address the client enters. Automatically dispatches tailored emails on order checkout, Master Nose consultations, and batch VIP campaigns.
 - **Automated SMTP Error Alerting (`n8n/workflow 5/Error Alert - My workflow 5.json`):** Dedicated `Error Trigger` workflow linked via `errorWorkflow` that emails diagnostic details (workflow name, failing node, error message, Cairo timestamp, and execution link) on failure.
 - **Programmatic Workflow Builder (`n8n/build-workflow.mjs`):** Node.js script that generates `n8n/master-nose.workflow.json` with `x-api-secret` header verification and output guardrails.
 
@@ -39,29 +40,33 @@ Maison-Noir-store/
 │   ├── public/                     # Perfume bottle imagery & static assets
 │   └── src/
 │       ├── components/
-│       │   ├── ChatbotWidget.jsx   # Layla Noor AI Concierge & Live ML Telemetry UI
-│       │   ├── MasterNoseModal.jsx # Bespoke AI Scent Consultation Modal
-│       │   ├── ProductCard.jsx     # Luxury 3D-tilt product cards
-│       │   ├── ProductDetail.jsx   # Olfactory pyramid & size selector drawer
-│       │   ├── CheckoutPanel.jsx   # Slide-over shopping bag & checkout flow
-│       │   ├── Navbar.jsx          # Navigation & collection filters
-│       │   └── CustomCursor.jsx    # Interactive luxury cursor
+│       │   ├── ChatbotWidget.jsx       # Layla Noor AI Concierge & Live ML Telemetry UI
+│       │   ├── MasterNoseModal.jsx     # Bespoke AI Scent Consultation Modal + Gmail Dossier
+│       │   ├── EmailConciergeModal.jsx # n8n Workflow 7 Personalized Gmail Dispatcher UI
+│       │   ├── ProductCard.jsx         # Luxury 3D-tilt product cards
+│       │   ├── ProductDetail.jsx       # Olfactory pyramid & size selector drawer
+│       │   ├── CheckoutPanel.jsx       # Slide-over shopping bag, checkout & Gmail receipt
+│       │   ├── Navbar.jsx              # Navigation & collection filters
+│       │   └── CustomCursor.jsx        # Interactive luxury cursor
 │       ├── data/
-│       │   └── products.js         # 18-bottle catalog with notes, prices & metadata
-│       └── App.jsx                 # Main storefront layout & state management
-├── backend/                        # Zero-dependency Node.js HTTP API + ML Engine
+│       │   └── products.js             # 18-bottle catalog with notes, prices & metadata
+│       └── App.jsx                     # Main storefront layout & state management
+├── backend/                            # Zero-dependency Node.js HTTP API + ML Engine
 │   ├── ml/
-│   │   └── recommender.js          # Kaggle Persona Matrix, TF-IDF & Cosine Recommender
-│   ├── chat.js                     # Layla Noor session engine, 6-step quiz & n8n bridge
-│   ├── compose.js                  # Master Nose n8n webhook client & local fallback
-│   ├── server.js                   # REST API (/api/recommend & /api/chat)
-│   └── .env.example                # Environment variable template
-└── n8n/                            # n8n Cloud AI Automation Workflows
+│   │   └── recommender.js              # Kaggle Persona Matrix, TF-IDF & Cosine Recommender
+│   ├── chat.js                         # Layla Noor session engine, 6-step quiz & n8n bridge
+│   ├── compose.js                      # Master Nose n8n webhook client & local fallback
+│   ├── email.js                        # n8n Workflow 7 Gmail webhook client & HTML preview
+│   ├── server.js                       # REST API (/api/recommend, /api/chat, /api/orders, /api/emails)
+│   └── .env.example                    # Environment variable template
+└── n8n/                                # n8n Cloud AI Automation Workflows
     ├── workflow 5/
     │   ├── My workflow 5.json              # Master Nose Gemini 2.0 Flash webhook workflow
     │   └── Error Alert - My workflow 5.json # Automated SMTP error alert workflow
     ├── chatbot assitace/
     │   └── My workflow 6.json              # Layla Noor Chat Trigger + Memory workflow
+    ├── email sender/
+    │   └── My workflow 7.json              # Personalized Gmail Marketing & Order Dispatcher
     ├── master-nose.workflow.json   # Code-built Master Nose workflow
     └── build-workflow.mjs          # Script to regenerate master-nose.workflow.json
 ```
@@ -99,8 +104,9 @@ npm run dev
 | :--- | :--- | :--- |
 | `POST` | `/api/recommend` | Scores client profile (`season`, `texture`, `vibe`, `tier`, `persona`, `memory`, `fabric`) via the Kaggle ML engine, composes a 3-part narrative via **n8n Workflow 5**, and logs telemetry to **Supabase** (`recommendation_events`). |
 | `POST` | `/api/chat` | Powers **Layla Noor** (`chatInput`, `sessionId`, `reset`, `mlConstraints`), persisting session memory in **Supabase** (`chat_sessions`) and logging recommended bottles (`recommendation_events`). |
-| `POST` | `/api/orders` | Saves completed storefront orders (`order_code`, customer details, shipping, items JSONB, and `grand_total`) into **Supabase** (`public.orders`). |
+| `POST` | `/api/orders` | Saves completed storefront orders (`order_code`, customer details, shipping, items JSONB, and `grand_total`) into **Supabase** (`public.orders`) and automatically dispatches a personalized confirmation email via **n8n Workflow 7**. |
 | `GET` | `/api/orders` | Retrieves the most recent orders from **Supabase** (`public.orders`). |
+| `POST` | `/api/emails` | Triggers **n8n Workflow 7 (`maison-noir-emails`)** with `{ recipients: [{ name, email, notes }] }` to compose personalized HTML emails with Gemini and send them from `muhamedgad444@gmail.com` to any client email address. |
 
 ---
 

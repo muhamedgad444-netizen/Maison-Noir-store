@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = ["Collection", "About", "Ingredients", "Stores"];
 
-const Navbar = ({ cartCount = 0, onBagClick, deviceMode = "desktop" }) => {
+const Navbar = ({ cartCount = 0, onBagClick, onEmailClick, deviceMode = "desktop" }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isCompact = deviceMode === "phone";
@@ -116,6 +116,25 @@ const Navbar = ({ cartCount = 0, onBagClick, deviceMode = "desktop" }) => {
                   {link}
                 </a>
               ))}
+              {onEmailClick && (
+                <button
+                  type="button"
+                  data-cursor
+                  onClick={onEmailClick}
+                  style={{
+                    fontSize: 9,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    background: "#111",
+                    color: "#d4af37",
+                    border: "none",
+                    padding: "6px 11px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✦ Gmail Concierge
+                </button>
+              )}
               <div style={{ width: 1, height: 14, background: "rgba(0,0,0,0.15)" }} />
             </div>
 

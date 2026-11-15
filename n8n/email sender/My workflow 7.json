@@ -1,0 +1,191 @@
+{
+  "name": "My workflow 7",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "maison-noir-emails",
+        "options": {}
+      },
+      "id": "8cdbfa52-a9b9-4f2d-b3c4-9f8c90a5f022",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "b6eb2030-ab42-45f9-b048-d7a4cab8f69f"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.recipients",
+        "options": {}
+      },
+      "id": "5a4ccea8-6bd1-47dc-9c2b-d718f81aed3a",
+      "name": "Split Recipients",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a promotional email for Maison Noir Perfumes to this customer.\n\nName: {{ $json.name }}\nEmail: {{ $json.email }}\nNotes about the customer: {{ $json.notes || \"none\" }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You write short, elegant marketing emails for Maison Noir, a luxury perfume house. Address the customer by first name. Tailor the message to any notes given; if there are none, keep it general. 80-140 words. Warm, refined tone, no emojis. Do not invent prices, discounts or product names that were not provided. Return a subject line and the body as simple HTML paragraphs, signed \"Maison Noir Perfumes\"."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "c7854d66-7bc2-4125-a1ee-5a0ba2eaef39",
+      "name": "Write Personalized Email",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "id": "e8577e2e-60c4-417e-85e1-f7528b6a1ada",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        224
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "e3kWaHVoGf0toFeQ",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"subject\": \"A scent made for you, Sara\",\n  \"html\": \"<p>Hi Sara,</p><p>...</p>\"\n}"
+      },
+      "id": "c4668d99-02ec-4e06-afd5-e878364c9e49",
+      "name": "Email Format",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "muhamedgad444@gmail.com",
+        "toEmail": "={{ $(\"Split Recipients\").item.json.email }}",
+        "subject": "={{ $json.output.subject }}",
+        "html": "={{ $json.output.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "4d9af0fe-70a2-485b-8bd7-8a75b872b2c5",
+      "name": "Send an Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        0
+      ],
+      "webhookId": "31df1925-c12b-42dd-8e7f-79904160fbec",
+      "credentials": {
+        "smtp": {
+          "id": "h9RJOTA5vmRQSY0m",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Recipients": {
+      "main": [
+        [
+          {
+            "node": "Write Personalized Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Personalized Email": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Write Personalized Email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Format": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Write Personalized Email",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "WNAaYKvxWC8bH9fb"
+  },
+  "versionId": "5d1ca4b0-700b-46d3-a3d0-f1d0fecac314",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3bffc07b00c0e70218b55a7db3ecdd625cebe3552a68ed4fed3e10d23f660298"
+  },
+  "nodeGroups": [],
+  "id": "iimg0tmjWgigUKsB",
+  "tags": []
+}

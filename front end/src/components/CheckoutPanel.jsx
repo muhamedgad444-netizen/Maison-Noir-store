@@ -946,7 +946,7 @@ const ShippingPaymentPhase = ({
 };
 
 // ── Phase 3: Order Confirmation ───────────────────────────────────────────
-const ConfirmationPhase = ({ orderResult, onClose }) => {
+const ConfirmationPhase = ({ orderResult, emailDispatch, onResendEmail, resending, onClose }) => {
   return (
     <motion.div
       key="confirm"
@@ -1067,9 +1067,51 @@ const ConfirmationPhase = ({ orderResult, onClose }) => {
         transition={{ delay: 1.5, duration: 0.6 }}
         style={{ fontSize: 11, color: "rgba(26,26,26,0.5)", lineHeight: 1.7, maxWidth: 300, fontWeight: 300 }}
       >
-        A handwritten calligraphed letter and official receipt have been dispatched to{" "}
+        A handwritten calligraphed letter and official receipt have been dispatched via{" "}
+        <strong style={{ color: "#111" }}>n8n Gmail Workflow 7</strong> to{" "}
         <span style={{ color: "#111" }}>{orderResult.customer?.email}</span>.
       </motion.p>
+
+      {orderResult.customer?.email && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.65, duration: 0.5 }}
+          style={{
+            marginTop: 12,
+            padding: "8px 14px",
+            background: "#f4f3ef",
+            border: "1px solid rgba(0,0,0,0.08)",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            fontSize: 9,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+          }}
+        >
+          <span style={{ color: "#2e7d32" }}>
+            ✓ {emailDispatch?.status === "dispatched" ? "Gmail Sent" : "Gmail Queued"}
+          </span>
+          <button
+            type="button"
+            onClick={onResendEmail}
+            disabled={resending}
+            style={{
+              background: "none",
+              border: "none",
+              textDecoration: "underline",
+              fontSize: 8.5,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#111",
+              cursor: "pointer",
+            }}
+          >
+            {resending ? "Sending..." : "Resend Email"}
+          </button>
+        </motion.div>
+      )}
 
       <motion.button
         data-cursor
@@ -1121,6 +1163,14 @@ const CheckoutPanel = ({ cart, onUpdateQty, onRemove, onClose, onClearCart }) =>
 
   // Stored order result for confirmation screen
   const [orderResult, setOrderResult] = useState({});
+  const [emailDispatch, setEmailDispatch] = useState(null);
+  const [resendingEmail, setResendingEmail] = useState(false);
+
+  const getApiBase = () =>
+    import.meta.env.VITE_API_URL ||
+    (typeof window !== "undefined" && window.location.hostname === "localhost"
+      ? "http://localhost:5000"
+      : "");
 
   const handlePlaceOrder = (totals) => {
     const generatedId = `MN-2026-${Math.floor(100000 + Math.random() * 900000)}`;
@@ -1134,18 +1184,48 @@ const CheckoutPanel = ({ cart, onUpdateQty, onRemove, onClose, onClearCart }) =>
       cart: [...cart],
     };
     setOrderResult(payload);
+    setEmailDispatch(null);
     setPhase(3);
 
-    const apiBase =
-      import.meta.env.VITE_API_URL ||
-      (typeof window !== "undefined" && window.location.hostname === "localhost"
-        ? "http://localhost:5000"
-        : "");
-    fetch(`${apiBase}/api/orders`, {
+    fetch(`${getApiBase()}/api/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-    }).catch(() => {});
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.emailDispatch) setEmailDispatch(data.emailDispatch);
+      })
+      .catch(() => {});
+  };
+
+  const handleResendOrderEmail = async () => {
+    if (!orderResult?.customer?.email) return;
+    setResendingEmail(true);
+    try {
+      const itemSummary = (orderResult.cart || [])
+        .map((i) => `${i.name} (${i.size || "100ml"} × ${i.quantity || 1})`)
+        .join(", ");
+      const res = await fetch(`${getApiBase()}/api/emails`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipients: [
+            {
+              name: orderResult.customer.name || "Valued Client",
+              email: orderResult.customer.email,
+              notes: `Order ${orderResult.orderId} · Selected fragrances: ${itemSummary} · Total: $${orderResult.grandTotal}`,
+            },
+          ],
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) setEmailDispatch(data);
+    } catch {
+      // ignore
+    } finally {
+      setResendingEmail(false);
+    }
   };
 
   const handleClose = () => {
@@ -1289,7 +1369,13 @@ const CheckoutPanel = ({ cart, onUpdateQty, onRemove, onClose, onClearCart }) =>
             )}
 
             {phase === 3 && (
-              <ConfirmationPhase orderResult={orderResult} onClose={handleClose} />
+              <ConfirmationPhase
+                orderResult={orderResult}
+                emailDispatch={emailDispatch}
+                onResendEmail={handleResendOrderEmail}
+                resending={resendingEmail}
+                onClose={handleClose}
+              />
             )}
           </AnimatePresence>
         </div>
