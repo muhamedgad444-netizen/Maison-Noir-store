@@ -7,22 +7,17 @@ const DEFAULT_N8N_EMAIL_WEBHOOK_URL =
   "https://muhamedshalaby.app.n8n.cloud/webhook/maison-noir-emails";
 
 export function composeEmailPreview(recipient = {}) {
-  const fullName = String(recipient.name || "Valued Guest").trim();
-  const firstName = fullName.split(/\s+/)[0] || "Guest";
+  const fullName = String(recipient.name || "Valued Client").trim();
+  const firstName = fullName.split(/\s+/)[0] || "Client";
   const notes = String(recipient.notes || "").trim();
+  const orderId = recipient.orderId || "MN-2026";
 
-  const subject = notes
-    ? `A scent composed for you, ${firstName}`
-    : `An invitation to Maison Noir, ${firstName}`;
-
-  const tailoredParagraph = notes
-    ? `<p>We noticed your affinity for ${notes}. Within our atelier in Paris, every Extrait de Parfum is composed to linger on skin and fabric like an unspoken signature—balancing rare botanicals, warm resins, and luminous woods tailored to your presence.</p>`
-    : `<p>Within our atelier in Paris, every Extrait de Parfum is composed at a thirty percent essence concentration to linger on skin and fabric like an unspoken signature—balancing rare botanicals, warm resins, and luminous woods.</p>`;
+  const subject = `Maison Noir · Order Confirmed (${orderId})`;
 
   const html =
     `<p>Dear ${firstName},</p>` +
-    tailoredParagraph +
-    `<p>Whether you are exploring your next seasonal flacon or living with a sample vial on warm skin, our private concierges remain at your disposal to curate a wardrobe that feels unmistakably yours.</p>` +
+    `<p>Thank you for your order with Maison Noir Haute Parfumerie. Your selection has been reserved in our Paris atelier and is being prepared for dispatch.</p>` +
+    (notes ? `<p><strong>Order Summary:</strong><br/>${notes}</p>` : "") +
     `<p>Warm regards,<br/>Maison Noir Perfumes</p>`;
 
   return {
@@ -81,20 +76,12 @@ async function postToN8nEmailWebhook(url, payload, timeoutMs = 25000) {
   }
 }
 
-/**
- * Triggers n8n Workflow 7 ("My workflow 7" - maison-noir-emails)
- * Payload expected by n8n Split Out node (`body.recipients`):
- * {
- *   recipients: [
- *     { name: "Sara", email: "sara@example.com", notes: "Loves warm vanilla & winter scents" }
- *   ]
- * }
- */
 export async function sendMaisonNoirEmails({ recipients = [] } = {}) {
   const cleanRecipients = (Array.isArray(recipients) ? recipients : [recipients])
     .map((r) => ({
       name: String(r?.name || "Maison Noir Client").trim(),
       email: String(r?.email || "").trim(),
+      orderId: r?.orderId ? String(r.orderId) : undefined,
       notes: String(r?.notes || "none").trim() || "none",
     }))
     .filter((r) => r.email && r.email.includes("@"));
@@ -147,7 +134,7 @@ export async function sendMaisonNoirEmails({ recipients = [] } = {}) {
 }
 
 /**
- * Helper to automatically send a personalized order email via n8n Workflow 7 when a customer checks out.
+ * Automatically sends a personalized Order Confirmation email via n8n Workflow 7 when a customer completes checkout.
  */
 export async function sendOrderConfirmationEmail(order = {}) {
   const email = order?.customer?.email || order?.customer_email;
@@ -161,23 +148,44 @@ export async function sendOrderConfirmationEmail(order = {}) {
       : [];
 
   const itemSummary = rawItems
-    .map((i) => `${i.name} (${i.size || i.selectedSize || "100ml"} × ${i.quantity || 1})`)
+    .map((i) => {
+      const qty = i.quantity || 1;
+      const size = i.size || i.selectedSize || "100ML";
+      const unitPrice =
+        i.calculatedPriceNumber ||
+        (typeof i.price === "string" ? parseInt(i.price.replace(/[^0-9]/g, ""), 10) : i.price) ||
+        165;
+      return `${i.name} (${size} × ${qty} — $${unitPrice * qty})`;
+    })
     .join(", ");
 
   const orderId = order.orderId || order.order_code || "MN-2026";
   const total = order.grandTotal ?? order.grand_total ?? "";
-  const city = order?.shipping?.city || order?.shipping_city || "Paris";
+  const addressParts = [
+    order?.shipping?.address || order?.shipping_address,
+    order?.shipping?.city || order?.shipping_city,
+    order?.shipping?.postalCode || order?.shipping_postal_code,
+    order?.shipping?.country || order?.shipping_country,
+  ].filter(Boolean);
+  const destination = addressParts.join(", ") || "Paris, France";
+  const shippingMethod =
+    (order?.shipping?.method || order?.shipping_method) === "white-glove"
+      ? "White-Glove VIP Concierge (Next-Day Hand Delivery)"
+      : "Air Express Dispatch (3–5 Working Days)";
 
   const notes = [
-    `Order ${orderId} confirmed`,
-    itemSummary ? `Selected fragrances: ${itemSummary}` : null,
-    total ? `Total: $${total}` : null,
-    city ? `Destination: ${city}` : null,
+    `OFFICIAL ORDER CONFIRMATION — Please confirm that this customer's order is confirmed and include all of the following order details in the email:`,
+    `Order Number: ${orderId}`,
+    itemSummary ? `Purchased Items: ${itemSummary}` : null,
+    total !== "" ? `Total Paid: $${total}` : null,
+    `Shipping Destination: ${destination}`,
+    `Delivery Method: ${shippingMethod}`,
+    order.promoCode ? `Privilege Code Applied: ${order.promoCode}` : null,
   ]
     .filter(Boolean)
-    .join(" · ");
+    .join(" | ");
 
   return sendMaisonNoirEmails({
-    recipients: [{ name, email, notes }],
+    recipients: [{ name, email, orderId, notes }],
   });
 }

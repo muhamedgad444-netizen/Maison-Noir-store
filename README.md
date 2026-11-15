@@ -41,11 +41,10 @@ Maison-Noir-store/
 │   └── src/
 │       ├── components/
 │       │   ├── ChatbotWidget.jsx       # Layla Noor AI Concierge & Live ML Telemetry UI
-│       │   ├── MasterNoseModal.jsx     # Bespoke AI Scent Consultation Modal + Gmail Dossier
-│       │   ├── EmailConciergeModal.jsx # n8n Workflow 7 Personalized Gmail Dispatcher UI
+│       │   ├── MasterNoseModal.jsx     # Bespoke AI Scent Consultation Modal
 │       │   ├── ProductCard.jsx         # Luxury 3D-tilt product cards
 │       │   ├── ProductDetail.jsx       # Olfactory pyramid & size selector drawer
-│       │   ├── CheckoutPanel.jsx       # Slide-over shopping bag, checkout & Gmail receipt
+│       │   ├── CheckoutPanel.jsx       # Slide-over shopping bag, checkout & automatic Gmail confirmation
 │       │   ├── Navbar.jsx              # Navigation & collection filters
 │       │   └── CustomCursor.jsx        # Interactive luxury cursor
 │       ├── data/

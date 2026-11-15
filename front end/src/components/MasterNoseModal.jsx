@@ -56,45 +56,6 @@ const MasterNoseModal = ({ onClose, onSelectProduct, onAddToCart, allProducts })
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [emailSending, setEmailSending] = useState(false);
-  const [emailSentStatus, setEmailSentStatus] = useState(null);
-
-  const handleSendDossierEmail = async (e) => {
-    e.preventDefault();
-    if (!clientEmail || !clientEmail.includes("@") || !result) return;
-    setEmailSending(true);
-    setEmailSentStatus(null);
-    try {
-      const apiBase =
-        import.meta.env.VITE_API_URL ||
-        (typeof window !== "undefined" && window.location.hostname === "localhost"
-          ? "http://localhost:5000"
-          : "");
-      const notes = `Diagnosed Archetype: ${result.archetype || "The Connoisseur"} · Recommended Bottle: ${result.product?.name} by ${result.product?.brand} (${result.product?.price}) · Season: ${season} · Notes Craving: ${texture} · Vibe: ${vibe}`;
-      const res = await fetch(`${apiBase}/api/emails`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipients: [
-            {
-              name: clientName.trim() || "Valued Client",
-              email: clientEmail.trim(),
-              notes,
-            },
-          ],
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Could not send email");
-      setEmailSentStatus(data);
-    } catch (err) {
-      setEmailSentStatus({ error: err.message || "Failed to dispatch email" });
-    } finally {
-      setEmailSending(false);
-    }
-  };
 
   const handleConsult = async (e) => {
     if (e) e.preventDefault();
@@ -567,86 +528,6 @@ const MasterNoseModal = ({ onClose, onSelectProduct, onAddToCart, allProducts })
                     }}
                   >
                     {result.message}
-                  </div>
-
-                  {/* Send Personalized Dossier via n8n Workflow 7 (Gmail) */}
-                  <div
-                    style={{
-                      marginTop: "1.5rem",
-                      paddingTop: "1.25rem",
-                      borderTop: "1px solid rgba(0,0,0,0.08)",
-                    }}
-                  >
-                    <p
-                      style={{
-                        fontSize: 8.5,
-                        letterSpacing: "0.28em",
-                        textTransform: "uppercase",
-                        color: "#111",
-                        marginBottom: 8,
-                      }}
-                    >
-                      ✦ Receive This Bespoke Scent Dossier via Gmail (n8n Workflow 7)
-                    </p>
-                    <form
-                      onSubmit={handleSendDossierEmail}
-                      style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Your Name"
-                        value={clientName}
-                        onChange={(e) => setClientName(e.target.value)}
-                        style={{
-                          flex: "1 1 140px",
-                          padding: "9px 11px",
-                          fontSize: 12,
-                          border: "1px solid rgba(0,0,0,0.16)",
-                          outline: "none",
-                        }}
-                      />
-                      <input
-                        type="email"
-                        required
-                        placeholder="your.email@gmail.com"
-                        value={clientEmail}
-                        onChange={(e) => setClientEmail(e.target.value)}
-                        style={{
-                          flex: "1.5 1 180px",
-                          padding: "9px 11px",
-                          fontSize: 12,
-                          border: "1px solid rgba(0,0,0,0.16)",
-                          outline: "none",
-                        }}
-                      />
-                      <button
-                        type="submit"
-                        disabled={emailSending}
-                        style={{
-                          padding: "9px 16px",
-                          background: "#111",
-                          color: "#d4af37",
-                          fontSize: 8.5,
-                          letterSpacing: "0.22em",
-                          textTransform: "uppercase",
-                          border: "none",
-                          cursor: "pointer",
-                        }}
-                      >
-                        {emailSending ? "Sending..." : "Email My Dossier →"}
-                      </button>
-                    </form>
-                    {emailSentStatus && !emailSentStatus.error && (
-                      <p style={{ fontSize: 11, color: "#2e7d32", marginTop: 8 }}>
-                        ✓ Personalized email dispatched via n8n Gmail Workflow 7 to{" "}
-                        <strong>{clientEmail}</strong>.
-                      </p>
-                    )}
-                    {emailSentStatus?.error && (
-                      <p style={{ fontSize: 11, color: "#c62828", marginTop: 8 }}>
-                        {emailSentStatus.error}
-                      </p>
-                    )}
                   </div>
                 </div>
               </motion.div>

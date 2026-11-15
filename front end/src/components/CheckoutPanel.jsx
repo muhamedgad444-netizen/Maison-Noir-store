@@ -1025,10 +1025,11 @@ const ConfirmationPhase = ({ orderResult, emailDispatch, onResendEmail, resendin
         style={{
           background: "#fff",
           border: "1px solid rgba(0,0,0,0.08)",
-          padding: "14px 20px",
+          padding: "16px 20px",
           margin: "1rem 0",
           width: "100%",
-          maxWidth: 340,
+          maxWidth: 360,
+          textAlign: "left",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
@@ -1045,11 +1046,73 @@ const ConfirmationPhase = ({ orderResult, emailDispatch, onResendEmail, resendin
           </span>
           <span style={{ fontSize: 9, color: "#111" }}>{orderResult.customer?.name || "Client"}</span>
         </div>
+
+        {/* Itemized Purchased Bottles */}
+        {Array.isArray(orderResult.cart) && orderResult.cart.length > 0 && (
+          <div
+            style={{
+              borderTop: "1px solid rgba(0,0,0,0.06)",
+              borderBottom: "1px solid rgba(0,0,0,0.06)",
+              padding: "8px 0",
+              margin: "8px 0",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 7.5,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "rgba(0,0,0,0.4)",
+                display: "block",
+                marginBottom: 6,
+              }}
+            >
+              Purchased Items
+            </span>
+            {orderResult.cart.map((item, idx) => {
+              const qty = item.quantity || 1;
+              const unitPrice =
+                item.calculatedPriceNumber ||
+                parseInt(String(item.price || "165").replace(/[^0-9]/g, ""), 10);
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: 9.5,
+                    color: "#111",
+                    marginBottom: 4,
+                  }}
+                >
+                  <span>
+                    {item.name} · {item.size || "100ML"} × {qty}
+                  </span>
+                  <span>${unitPrice * qty}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {orderResult.shipping?.address && (
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6, gap: 10 }}>
+            <span style={{ fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)" }}>
+              Destination
+            </span>
+            <span style={{ fontSize: 9, color: "#111", textAlign: "right" }}>
+              {orderResult.shipping.address}, {orderResult.shipping.city}
+            </span>
+          </div>
+        )}
+
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
           <span style={{ fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)" }}>
             Estimated Delivery
           </span>
-          <span style={{ fontSize: 9, color: "#2e7d32" }}>3–5 Working Days</span>
+          <span style={{ fontSize: 9, color: "#2e7d32" }}>
+            {orderResult.shipping?.method === "white-glove" ? "Next-Day White-Glove" : "3–5 Working Days"}
+          </span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: 6 }}>
           <span style={{ fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(0,0,0,0.4)" }}>
@@ -1065,11 +1128,10 @@ const ConfirmationPhase = ({ orderResult, emailDispatch, onResendEmail, resendin
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.5, duration: 0.6 }}
-        style={{ fontSize: 11, color: "rgba(26,26,26,0.5)", lineHeight: 1.7, maxWidth: 300, fontWeight: 300 }}
+        style={{ fontSize: 11, color: "rgba(26,26,26,0.5)", lineHeight: 1.7, maxWidth: 320, fontWeight: 300 }}
       >
-        A handwritten calligraphed letter and official receipt have been dispatched via{" "}
-        <strong style={{ color: "#111" }}>n8n Gmail Workflow 7</strong> to{" "}
-        <span style={{ color: "#111" }}>{orderResult.customer?.email}</span>.
+        An official order confirmation and receipt with your full order details has been automatically sent to{" "}
+        <span style={{ color: "#111", fontWeight: 500 }}>{orderResult.customer?.email}</span>.
       </motion.p>
 
       {orderResult.customer?.email && (

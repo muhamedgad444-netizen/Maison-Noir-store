@@ -34,12 +34,12 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "=Write a promotional email for Maison Noir Perfumes to this customer.\n\nName: {{ $json.name }}\nEmail: {{ $json.email }}\nNotes about the customer: {{ $json.notes || \"none\" }}",
+        "text": "=Write an official order confirmation email for Maison Noir Perfumes to this customer.\n\nName: {{ $json.name }}\nEmail: {{ $json.email }}\nOrder Details: {{ $json.notes || \"none\" }}",
         "hasOutputParser": true,
         "messages": {
           "messageValues": [
             {
-              "message": "You write short, elegant marketing emails for Maison Noir, a luxury perfume house. Address the customer by first name. Tailor the message to any notes given; if there are none, keep it general. 80-140 words. Warm, refined tone, no emojis. Do not invent prices, discounts or product names that were not provided. Return a subject line and the body as simple HTML paragraphs, signed \"Maison Noir Perfumes\"."
+              "message": "You write refined, warm order confirmation emails for Maison Noir, a luxury perfume house in Paris. Address the customer by first name, thank them for their purchase, and clearly include all provided order details (Order Number, Purchased Items with sizes and quantities, Total Paid, Shipping Address, and Delivery Method) in clean, readable HTML paragraphs. 90-160 words. Refined luxury tone, no emojis. Sign off as \"Maison Noir Perfumes\"."
             }
           ]
         },

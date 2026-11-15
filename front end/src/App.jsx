@@ -7,7 +7,6 @@ import ProductDetail, { getPriceForSize } from "./components/ProductDetail";
 import CheckoutPanel from "./components/CheckoutPanel";
 import ChatbotWidget from "./components/ChatbotWidget";
 import MasterNoseModal from "./components/MasterNoseModal";
-import EmailConciergeModal from "./components/EmailConciergeModal";
 import { products, fragranceFamilies } from "./data/products";
 
 const marqueeText = [
@@ -34,7 +33,6 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [bagOpen, setBagOpen] = useState(false);
   const [masterNoseOpen, setMasterNoseOpen] = useState(false);
-  const [emailConciergeOpen, setEmailConciergeOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowIntro(false), 2000);
@@ -287,7 +285,6 @@ export default function App() {
         <Navbar
           cartCount={totalBagItemsCount}
           onBagClick={() => setBagOpen(true)}
-          onEmailClick={() => setEmailConciergeOpen(true)}
         />
 
         {/* ── Hero — Full editorial luxury ─────── */}
@@ -426,27 +423,6 @@ export default function App() {
             >
               Explore Summer Collection ☀️
             </a>
-
-            <button
-              type="button"
-              data-cursor
-              onClick={() => setEmailConciergeOpen(true)}
-              style={{
-                fontSize: 8.5,
-                letterSpacing: "0.3em",
-                textTransform: "uppercase",
-                color: "#d4af37",
-                background: "#111",
-                border: "1px solid rgba(212,175,55,0.45)",
-                padding: "12px 24px",
-                cursor: "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              ✦ AI Gmail Concierge
-            </button>
           </motion.div>
         </section>
 
@@ -932,13 +908,6 @@ export default function App() {
               onAddToCart={addToCart}
               allProducts={products}
             />
-          )}
-        </AnimatePresence>
-
-        {/* ── n8n Workflow 7 · AI Gmail Concierge Modal ─── */}
-        <AnimatePresence>
-          {emailConciergeOpen && (
-            <EmailConciergeModal onClose={() => setEmailConciergeOpen(false)} />
           )}
         </AnimatePresence>
 
